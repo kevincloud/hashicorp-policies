@@ -31,7 +31,11 @@ has_tags = func(tags) {
     for tfplan.planned_values.resources as r {
         if "tags" in tfplan.planned_values.resources[r].values {
             if tfplan.planned_values.resources[r].values["tags"] == null {
-                append(untagged, r)
+                rtags = {
+                    "assigned_tags": [],
+                    "missing_tags": tags,
+                    "empty_tags": [],
+                }
                 retval = false
             } else {
                 rtags = {}
@@ -41,14 +45,8 @@ has_tags = func(tags) {
                 for tfplan.planned_values.resources[r].values["tags"] as tag {
                     val = tfplan.planned_values.resources[r].values["tags"][tag]
                     if val == "" or val == null {
-                        if (r not in untagged) {
-                            append(untagged, r)
-                        }
                         append(etags, tag)
                     } else {
-                        if (r not in tagged) {
-                            append(tagged, r)
-                        }
                         append(atags, tag)
                     }
                 }
@@ -78,16 +76,6 @@ has_tags = func(tags) {
     print("Tagging results:")
     print("----------------")
     print(json.marshal(resources))
-
-    // if length(missing_tags) > 0 {
-    //     print("The following mandatory tags are missing or empty:")
-    //     for missing_tags as i {
-    //         print("  " + i)
-    //     }
-    //     retval = false
-    // } else {
-    //     retval = true
-    // }
 
     return retval
 }
