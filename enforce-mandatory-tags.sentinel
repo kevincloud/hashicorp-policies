@@ -66,7 +66,7 @@ has_tags = func(tags) {
 
     print("Tagging results:")
     print("----------------")
-    print(json.marshall(resources))
+    print(json.marshal(resources))
 
     if length(missing_tags) > 0 {
         print("The following mandatory tags are missing or empty:")
