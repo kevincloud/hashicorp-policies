@@ -1,6 +1,7 @@
 import "tfplan/v2" as tfplan
 import "tfconfig/v2" as tfconfig
 import "strings"
+import "json"
 
 mandatory_tags = [
     "Owner",
@@ -46,8 +47,14 @@ has_tags = func(tags) {
         }
     }
 
+    tag_results = {
+        "tagged": assigned_tags,
+        "tag_missing": missing_tags,
+        "tag_empty": empty_tags,
+    }
+
     resources = {
-        "taggable_resources": taggable,
+        "taggable_resources": tag_results,
         "non_taggable_resources": non_taggable,
     }
 
@@ -59,7 +66,7 @@ has_tags = func(tags) {
 
     print("Tagging results:")
     print("----------------")
-    print(resources)
+    print(json.marshall(resources))
 
     if length(missing_tags) > 0 {
         print("The following mandatory tags are missing or empty:")
