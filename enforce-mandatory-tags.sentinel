@@ -48,7 +48,7 @@ has_tags = func(tags) {
 
     resources = {
         "taggable_resources": taggable,
-        "non_taggable_resources": non_taggable
+        "non_taggable_resources": non_taggable,
     }
 
     for tags as t {
