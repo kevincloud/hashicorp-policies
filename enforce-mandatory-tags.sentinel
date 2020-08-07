@@ -1,0 +1,68 @@
+import "tfplan/v2" as tfplan
+import "tfconfig/v2" as tfconfig
+import "strings"
+
+mandatory_tags = [
+    "Owner",
+    "Region",
+    "Purpose",
+    "TTL"
+]
+
+print
+for tfconfig.providers as p {
+    print(tfconfig.providers[p])
+}
+
+provider = "aws"
+
+has_tags = func(tags) {
+    assigned_tags = []
+    empty_tags = []
+    missing_tags = []
+    retval = false
+
+    for tfplan.planned_values.resources as r {
+        if "tags" in tfplan.planned_values.resources[r].values {
+            if tfplan.planned_values.resources[r].values["tags"] == null {
+                retval = false
+            } else {
+                for tfplan.planned_values.resources[r].values["tags"] as tag {
+                    val = tfplan.planned_values.resources[r].values["tags"][tag]
+                    if val == "" or val == null {
+                        append(empty_tags, tag)
+                    } else {
+                        append(assigned_tags, tag)
+                    }
+                }
+            }
+        }
+    }
+
+    for tags as t {
+        if t not in assigned_tags {
+            append(missing_tags, t)
+        }
+    }
+
+    if length(missing_tags) > 0 {
+        print("The following mandatory tags are missing or empty:")
+        for missing_tags as i {
+            print("  " + i)
+        }
+        retval = false
+    } else {
+        retval = true
+    }
+
+    return retval
+}
+
+if provider == "aws" {
+    result = has_tags(mandatory_tags)
+} else {
+    print("This policy is for a different provider and will not be processed")
+    result = true
+}
+
+main = rule { result }
