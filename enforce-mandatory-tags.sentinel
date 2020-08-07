@@ -29,6 +29,7 @@ has_tags = func(tags) {
     retval = false
 
     for tfplan.planned_values.resources as r {
+        print(r)
         if "tags" in tfplan.planned_values.resources[r].values {
             append(taggable, r)
             if tfplan.planned_values.resources[r].values["tags"] == null {
@@ -57,7 +58,7 @@ has_tags = func(tags) {
 
     tag_results = {
         "tagged": tagged,
-        "untagged": missing_tags,
+        "untagged": untagged,
     }
 
     resources = {
