@@ -19,72 +19,75 @@ for tfconfig.providers as p {
 provider = "aws"
 
 has_tags = func(tags) {
-    assigned_tags = []
-    empty_tags = []
-    missing_tags = []
+    // assigned_tags = []
+    // empty_tags = []
+    // missing_tags = []
     taggable = []
     non_taggable = []
-    tagged = []
-    untagged = []
-    retval = false
+    // tagged = []
+    // untagged = []
+    retval = true
 
     for tfplan.planned_values.resources as r {
-        print(" - " + r)
         if "tags" in tfplan.planned_values.resources[r].values {
-            append(taggable, r)
             if tfplan.planned_values.resources[r].values["tags"] == null {
                 append(untagged, r)
                 retval = false
             } else {
+                rtags = {}
+                etags = []
+                mtags = []
+                atags = []
                 for tfplan.planned_values.resources[r].values["tags"] as tag {
                     val = tfplan.planned_values.resources[r].values["tags"][tag]
                     if val == "" or val == null {
                         if (r not in untagged) {
                             append(untagged, r)
                         }
-                        append(empty_tags, tag)
+                        append(etags, tag)
                     } else {
                         if (r not in tagged) {
                             append(tagged, r)
                         }
-                        append(assigned_tags, tag)
+                        append(atags, tag)
                     }
                 }
+                for tags as t {
+                    if t not in atags {
+                        append(mtags, t)
+                        retval = false
+                    }
+                }
+                rtags = {
+                    "assigned_tags": atags,
+                    "missing_tags": mtags,
+                    "empty_tags": etags,
+                }
             }
+            append(taggable, { r: rtags, })
         } else {
             append(non_taggable, r)
         }
     }
 
-    tag_results = {
-        "tagged": tagged,
-        "untagged": untagged,
-    }
-
     resources = {
-        "taggable_resources": tag_results,
+        "taggable_resources": taggable,
         "non_taggable_resources": non_taggable,
-    }
-
-    for tags as t {
-        if t not in assigned_tags {
-            append(missing_tags, t)
-        }
     }
 
     print("Tagging results:")
     print("----------------")
-    print(resources)
+    print(json.marshal(resources))
 
-    if length(missing_tags) > 0 {
-        print("The following mandatory tags are missing or empty:")
-        for missing_tags as i {
-            print("  " + i)
-        }
-        retval = false
-    } else {
-        retval = true
-    }
+    // if length(missing_tags) > 0 {
+    //     print("The following mandatory tags are missing or empty:")
+    //     for missing_tags as i {
+    //         print("  " + i)
+    //     }
+    //     retval = false
+    // } else {
+    //     retval = true
+    // }
 
     return retval
 }
