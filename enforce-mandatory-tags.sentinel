@@ -6,7 +6,7 @@ mandatory_tags = [
     "Owner",
     "Region",
     "Purpose",
-    "TTL"
+    "TTL",
 ]
 
 print
