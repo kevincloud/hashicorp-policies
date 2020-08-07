@@ -24,20 +24,28 @@ has_tags = func(tags) {
     missing_tags = []
     taggable = []
     non_taggable = []
-    resources = {}
+    tagged = []
+    untagged = []
     retval = false
 
     for tfplan.planned_values.resources as r {
         if "tags" in tfplan.planned_values.resources[r].values {
             append(taggable, r)
             if tfplan.planned_values.resources[r].values["tags"] == null {
+                append(untagged, r)
                 retval = false
             } else {
                 for tfplan.planned_values.resources[r].values["tags"] as tag {
                     val = tfplan.planned_values.resources[r].values["tags"][tag]
                     if val == "" or val == null {
+                        if (r not in untagged) {
+                            append(untagged, r)
+                        }
                         append(empty_tags, tag)
                     } else {
+                        if (r not in tagged) {
+                            append(tagged, r)
+                        }
                         append(assigned_tags, tag)
                     }
                 }
@@ -48,8 +56,8 @@ has_tags = func(tags) {
     }
 
     tag_results = {
-        "tagged": assigned_tags,
-        "tag_missing": missing_tags,
+        "tagged": tagged,
+        "untagged": missing_tags,
         "tag_empty": empty_tags,
     }
 
