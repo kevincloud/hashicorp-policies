@@ -9,9 +9,10 @@ mandatory_tags = [
     "TTL",
 ]
 
-print
+providers = []
+
 for tfconfig.providers as p {
-    print(tfconfig.providers[p])
+    append(providers, tfconfig.providers[p].name)
 }
 
 provider = "aws"
@@ -58,7 +59,7 @@ has_tags = func(tags) {
     return retval
 }
 
-if provider == "aws" {
+if ("aws" in providers) {
     result = has_tags(mandatory_tags)
 } else {
     print("This policy is for a different provider and will not be processed")
