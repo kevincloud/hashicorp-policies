@@ -21,10 +21,14 @@ has_tags = func(tags) {
     assigned_tags = []
     empty_tags = []
     missing_tags = []
+    taggable = []
+    non_taggable = []
+    resources = {}
     retval = false
 
     for tfplan.planned_values.resources as r {
         if "tags" in tfplan.planned_values.resources[r].values {
+            append(taggable, r)
             if tfplan.planned_values.resources[r].values["tags"] == null {
                 retval = false
             } else {
@@ -37,7 +41,14 @@ has_tags = func(tags) {
                     }
                 }
             }
+        } else {
+            append(non_taggable, r)
         }
+    }
+
+    resources = {
+        "taggable_resources": taggable,
+        "non_taggable_resources": non_taggable
     }
 
     for tags as t {
@@ -45,6 +56,10 @@ has_tags = func(tags) {
             append(missing_tags, t)
         }
     }
+
+    print("Tagging results:")
+    print("----------------")
+    print(resources)
 
     if length(missing_tags) > 0 {
         print("The following mandatory tags are missing or empty:")
