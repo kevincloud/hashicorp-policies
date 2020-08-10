@@ -29,7 +29,7 @@ has_tags = func(tags) {
     retval = true
 
     for tfplan.planned_values.resources as r {
-        if "tags" in tfplan.planned_values.resources[r].values {
+        if "tags" in tfplan.planned_values.resources[r].values and tfplan.planned_values.resources[r].mode != "data" {
             if tfplan.planned_values.resources[r].values["tags"] == null {
                 rtags = {
                     "assigned_tags": [],
