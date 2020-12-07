@@ -4,10 +4,11 @@ import "strings"
 import "json"
 
 mandatory_tags = [
-    "Owner",
-    "Region",
-    "Purpose",
-    "TTL",
+    "owner",
+    "se-region",
+    "purpose",
+    "ttl",
+    "terraform",
 ]
 
 providers = []
